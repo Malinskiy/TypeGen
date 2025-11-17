@@ -42,15 +42,18 @@ internal class Application : IApplication
 
     private RootCommand GetRootCommand()
     {
-        var rootCommand = new RootCommand();
+        var assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version;
+        var versionOutput = $"{assemblyVersion.Major}.{assemblyVersion.Minor}.{assemblyVersion.Build}";
 
-        var versionOption = new Option<string>("--version")
+        var rootCommand = new RootCommand
         {
-            Description = "Show TypeGen version.",
-            DefaultValueFactory = x => ApplicationConfig.Version
+            Description = $"TypeGen {versionOutput}"
         };
 
-        rootCommand.Options.Add(versionOption);
+        rootCommand.SetAction((ParseResult parseResult) =>
+        {
+            return rootCommand.Parse("--help").InvokeAsync();
+        });
 
         var generateCommand = new Command("generate", "Generate TypeScript files.");
 
